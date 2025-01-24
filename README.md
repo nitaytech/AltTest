@@ -1,7 +1,7 @@
 # The Alt-Test: How to Statistically Justify Replacing Human Annotators by LLMs
 
 This repository contains the code and data for the paper <br>
-[**The Trial of LLM-as-a-Judge: How to Statistically Justify Replacing Human Annotators by LLMs with the Alt-Test**]() <br>
+[**The Trial of LLM-as-a-Judge: How to Statistically Justify Replacing Human Annotators by LLMs with the Alt-Test**](https://arxiv.org/abs/2501.10970) <br>
 by [Nitay Calderon](https://nitaytech.github.io/), [Roi Reichart](https://roireichart.com/) and [Rotem Dror](https://rtmdrr.github.io/)
 <br>
 
@@ -58,4 +58,12 @@ Please cite the relevant papers when using the datasets.
 
 If you use this code or data, please cite our paper:
 ```
+@inproceedings{Calderon2025TheAA,
+  title={The Alternative Annotator Test for LLM-as-a-Judge: How to Statistically Justify Replacing Human Annotators with LLMs},
+  author={Nitay Calderon and Roi Reichart and Rotem Dror},
+  journal={ArXiv},
+  volume={abs/2501.10970},
+  year={2025},
+  url={https://arxiv.org/abs/2501.10970}
+}
 ```
