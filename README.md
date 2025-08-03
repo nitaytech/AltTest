@@ -8,7 +8,7 @@ To run the alt-test, you need 50–100 instances annotated by at least two human
 ----
 
 This repository contains the code and data for the paper <br>
-[**The Trial of LLM-as-a-Judge: How to Statistically Justify Replacing Human Annotators by LLMs with the Alt-Test**](https://arxiv.org/abs/2501.10970) <br>
+[**The Alternative Annotator Test for LLM-as-a-Judge: How to Statistically Justify Replacing Human Annotators with LLMs**](https://arxiv.org/abs/2501.10970) <br>
 by [Nitay Calderon](https://nitaytech.github.io/), [Roi Reichart](https://roireichart.com/) and [Rotem Dror](https://rtmdrr.github.io/)
 <br>
 
