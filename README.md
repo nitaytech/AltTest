@@ -14,7 +14,7 @@ by [Nitay Calderon](https://nitaytech.github.io/), [Roi Reichart](https://roirei
 
 <img src="figures/intro.png" width="100%" align="center">
 
-The approach follows a leave-one-out strategy, where one human annotator is excluded at a time, and the LLM is compared to the remaining human annotators. Similarly, we compare the excluded annotator to the remaining annotators to assess who better represents them: the LLM or the excluded human annotator.  Our procedure also incorporates `epsilon`, a cost-benefit hyperparameter that accounts for the efficiency advantages of the LLM (e.g., lower cost, faster processing) by applying a penalty to human annotators.
+The approach follows a leave-one-out strategy, where one human annotator is excluded at a time, and the LLM is compared to the remaining human annotators. Similarly, we compare the excluded annotator to the remaining annotators to assess who better represents them: the LLM or the excluded human annotator.  Our procedure also incorporates $\varepsilon$, a cost-benefit hyperparameter that accounts for the efficiency advantages of the LLM (e.g., lower cost, faster processing) by applying a penalty to human annotators.
 
 If the LLM "wins" (i.e., aligns better) in most comparisons, we conclude that the LLM can replace human annotators.
 
@@ -22,7 +22,8 @@ If the LLM "wins" (i.e., aligns better) in most comparisons, we conclude that th
 
 ### Quick Start
 
-We provide an example of how to run the Alt-Test in the `alt_test_example.ipynb` notebook. 
+Please read the [FAQ below](#faq).
+We provide an example of how to run the Alt-Test in the `alt_test_example.ipynb` notebook.
 The only requirement is to have the `scipy` package installed:<br>
 ```bash
 pip install scipy
@@ -46,6 +47,35 @@ Make sure your data is in the correct format:<br>
     ```python
     {'instance1': 'A', 'instance2': 'B', 'instance3': 'A'}
     ```
+
+### Simulation
+
+We provide a simulation tool (see last section in `alt_test_example.ipynb`) to help you decide how many annotated instances are needed to apply the alt-test reliably, and which \$\varepsilon\$ value is appropriate for your use case.
+More details about the simulation are provided in Section C in the appendix of the paper.
+
+You can configure the simulation to match your annotation setup by adjusting:
+
+* The number of categories in your task
+* The expected reliability of your human annotators (via a noise parameter)
+* The expected accuracy of the LLM
+
+Example default configuration:
+
+```python
+n_datasets = 20            # Number of simulated datasets
+n_boots = 10               # Bootstraps per dataset
+sizes = range(30, 201, 10) # Instance sizes from 30 to 200
+n_categories = 4           # Number of class labels
+noise_annotators = 0.3     # Controls the annotators reliability
+noise_llm = 0.3            # Controls the LLM reliability
+```
+
+> 💡 Inter-annotator agreement (IAA) decreases with higher noise:
+> 0.1 → 0.80, 0.2 → 0.63, 0.3 → 0.48, 0.4 → 0.36
+
+The output includes winning rates and advantage probability across different sample sizes and \$\varepsilon\$ values, allowing you to make informed decisions tailored to your task.
+
+<img src="figures/simulation_noises.png" width="100%" align="center">
 
 ### Datasets
 
@@ -71,20 +101,40 @@ Please cite the relevant papers when using the datasets.
 
 If you use this code or data, please cite our paper:
 ```
-@inproceedings{Calderon2025TheAA,
-  title={The Alternative Annotator Test for LLM-as-a-Judge: How to Statistically Justify Replacing Human Annotators with LLMs},
-  author={Nitay Calderon and Roi Reichart and Rotem Dror},
-  journal={ArXiv},
-  volume={abs/2501.10970},
-  year={2025},
-  url={https://arxiv.org/abs/2501.10970}
+@inproceedings{calderon-etal-2025-alternative,
+    title = "The Alternative Annotator Test for {LLM}-as-a-Judge: How to Statistically Justify Replacing Human Annotators with {LLM}s",
+    author = "Calderon, Nitay  and
+      Reichart, Roi  and
+      Dror, Rotem",
+    editor = "Che, Wanxiang  and
+      Nabende, Joyce  and
+      Shutova, Ekaterina  and
+      Pilehvar, Mohammad Taher",
+    booktitle = "Proceedings of the 63rd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)",
+    month = jul,
+    year = "2025",
+    address = "Vienna, Austria",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2025.acl-long.782/",
+    pages = "16051--16081",
+    ISBN = "979-8-89176-251-0",
+    abstract = "The ``LLM-as-an-annotator'' and ``LLM-as-a-judge'' paradigms employ Large Language Models (LLMs) as annotators, judges, and evaluators in tasks traditionally performed by humans. LLM annotations are widely used, not only in NLP research but also in fields like medicine, psychology, and social science. Despite their role in shaping study results and insights, there is no standard or rigorous procedure to determine whether LLMs can replace human annotators. In this paper, we propose a novel statistical procedure, the Alternative Annotator Test (alt-test), that requires only a modest subset of annotated examples to justify using LLM annotations. Additionally, we introduce a versatile and interpretable measure for comparing LLM annotators and judges. To demonstrate our procedure, we curated a diverse collection of ten datasets, consisting of language and vision-language tasks, and conducted experiments with six LLMs and four prompting techniques. Our results show that LLMs can sometimes replace humans with closed-source LLMs (such as GPT-4o), outperforming the open-source LLMs we examine, and that prompting techniques yield judges of varying quality. We hope this study encourages more rigorous and reliable practices."
 }
 ```
 
-
-### FAQ
+# FAQ
 
 This FAQ is based on the FAQ section in the paper.
+
+#### Q: How should I report the alt-test results?
+**A:** We recommend the following best practices for applying and reporting the alt-test results:
+
+1. Provide details about the human annotators, including their profile, level of expertise, annotation guidelines, training, and the overall process.
+2. Explain the rationale behind the choice of $\varepsilon$ (see the relevant question below for guidance).
+3. For selecting the number of instances, see the relevant question below.
+4. Report a measure of reliability for the human annotators, such as inter-annotator agreement (e.g., Cohen’s κ) or correlation measures. This is essential to ensure that the annotators are sufficiently reliable and the $\varepsilon$ value is appropriate.
+5. For selecting the LLM-as-a-judge, report the average advantage probability (ρ), clearly state which LLMs are compared, and provide their corresponding ρ values.
+6. Report the winning rate of the selected LLM.
 
 #### Q: Why not use an Inter-Annotator Agreement (IAA) measure?
 **A:**  Our procedure is a type of IAA, but unlike traditional IAA measures (such as Cohen’s kappa), which assess agreement among a group of annotators, our goal is to \textit{compare} the LLM to the group to determine whether it can replace them.
@@ -99,18 +149,18 @@ In contrast, our procedure involves statistical practices and provides clear pas
 #### Q: What if I have annotations from a single human annotator?
 **A:**  Since our procedure requires at least two annotators, we recommend recruiting additional annotators for the alt-test. However, if the single annotator is an expensive expert (or you trust their annotations) and cannot recruit others at the same expertise level, you can instead recruit lower-quality annotators and test who better represents the expert: the LLM or the newly recruited annotators. We refer to this as the single-expert scenario and provide a detailed discussion on adjusting our procedure in Appendix Section "A Single Expert Annotator".
 
-#### Q: How do I select the `epsilon` value?
-**A:**  We discuss this topic in detail in Section "The Cost-Benefit Hyperparameter". Note that `epsilon` is the cost-benefit hyperparameter, where higher values indicate greater efficiency advantages of the LLM. As a rule of thumb, for expert annotators (expensive, sometimes inaccessible), set $\varepsilon=0.2$. For skilled annotators (e.g., undergraduate students, trained workers, etc.), set $\varepsilon=0.15$. For crowd-workers, set $\varepsilon=0.1$. 
+#### Q: How do I select the $\varepsilon$ value?
+**A:**  We discuss this topic in detail in \S\ref{sub:threshold}. Note that $\varepsilon$ is the cost-benefit hyperparameter, where higher values indicate greater efficiency advantages of the LLM. As a rule of thumb, for expert annotators (reliable but expensive, sometimes inaccessible), set $\varepsilon=0.2$. For skilled annotators (e.g., undergraduate students, trained workers, etc., who are less reliable than experts), set $\varepsilon=0.15$. For crowd-workers, set $\varepsilon=0.1$. Moreover, the choice of $\varepsilon$ should depend on the reliability of the human annotators. When IAA is low, a smaller $\varepsilon$ should be used. The simulation-based analysis in Appendix~\ref{app:simulations} can help understand the effect of IAA on the alt-test, and guide the selection of an appropriate $\varepsilon$.
 
 #### Q: How many instances should I annotate?
-**A:**  We discuss this topic in detail in Section "The Number of Instances". To ensure the normality assumption of the t-test holds, you should have at least 30 instances. Our analysis shows that annotating between 50 and 100 instances is sufficient in most cases. Obviously, the more annotated instances, the better, as this increases the statistical power of the t-test and the likelihood of the LLM passing the alt-test.
+**A:**  We discuss this topic in detail in \S\ref{sub:instances}. To ensure the normality assumption of the t-test holds, you should have at least 30 instances. Our analysis shows that annotating between 50 and 100 instances is sufficient in most cases. Obviously, the more annotated instances, the better, as this increases the statistical power of the t-test and the likelihood of the LLM passing the alt-test. We encourage researchers to conduct simulation analyses similar to the one presented in Appendix~\ref{app:simulations} to help determine the required number of instances. The simulation code is available in our GitHub repository. It can be customized by adjusting parameters such as the number of categories or the expected IAA to reflect the characteristics of their data.
 
 #### Q: What if I have fewer than 30 annotated instances per annotator?
 **A:**  In this case, the normality assumption of the t-test does not hold, so a non-parametric test, such as the Wilcoxon signed-rank test, should be used instead. Still, we strongly recommend having annotators label additional instances. See the next question for an alternative approach.
 
 #### Q: I have two sets of human annotators. Can I combine annotators from the first set with the second set to increase the number of instances per annotator?
 **A:** If you have two separate sets of annotators who annotated different, non-overlapping instances, you can artificially increase the number of instances per annotator by pairing them across sets. 
-For example, suppose Set 1 consists of three annotators who annotated 20 instances, and Set 2 consists of another three annotators who annotated a different set of 20 instances. You can combine an annotator from Set 1 with an annotator from Set 2, treating them as a single ``combined annotator'' with 40 instances. To improve robustness, you can form multiple such pairs and report the average winning rate across different pairing combinations.
+For example, suppose Set 1 consists of three annotators who annotated 20 instances, and Set 2 consists of another three annotators who annotated a different set of 20 instances. You can combine an annotator from Set 1 with an annotator from Set 2, treating them as a single "combined annotator" with 40 instances. To improve robustness, you can form multiple such pairs and report the average winning rate across different pairing combinations.
 While this approach can increase the number of annotated instances per annotator, it is not ideal. The best practice is still to annotate more instances. Combining annotators like this may also increase the variance of the statistics (since we combine instances annotated by different distributions). This could lead to higher p-values, making the LLM fail.
 
 #### Q: What if annotators use a different scale?
